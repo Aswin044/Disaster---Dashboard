@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup - Disaster Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>🧭 Sign Up for Disaster Predictor</h2>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Choose a username" required>
+        <input type="password" name="password" placeholder="Choose a password" required>
+        <button type="submit">Sign Up</button>
+    </form>
+    <p>Already registered? <a href="{{ url_for('login') }}">Login here</a></p>
+</div>
+</body>
+</html>

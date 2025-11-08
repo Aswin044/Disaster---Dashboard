@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ disaster|capitalize }} Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .map-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        h2 {
+            margin: 0 0 15px 0;
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            font-weight: 600;
+            font-size: 1.8em;
+            text-align: center;
+            width: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 550px;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        a {
+            margin-top: 15px;
+            color: #ff4081;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #ff79a8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="map-card">
+    <h2>🌍 {{ disaster|capitalize }} Occurrence Probability Map</h2>
+    <div id="map"></div>
+    <a href="{{ url_for('dashboard') }}">⬅ Back to Dashboard</a>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+    // Set dynamic background based on disaster
+    const backgrounds = {
+        "fire": "{{ url_for('static', filename='images/ff.jpg') }}",
+        "flood": "{{ url_for('static', filename='images/fl.png') }}",
+        "earthquake": "{{ url_for('static', filename='images/eq.jpg') }}",
+        "storm": "{{ url_for('static', filename='images/st.jpg') }}",
+        "default": "https://images.unsplash.com/photo-1520694478166-daaaaec95b69?auto=format&fit=crop&w=1500&q=80"
+    };
+
+    const disaster = "{{ disaster }}".toLowerCase();
+    document.body.style.backgroundImage = `url('${backgrounds[disaster] || backgrounds.default}')`;
+
+    // Initialize the map
+    const map = L.map('map').setView([20, 0], 2);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri — Source: Esri, Earthstar Geographics, NASA, USGS, NOAA'
+    }).addTo(map);
+
+    // Fetch heatmap data
+    fetch(`/api/disaster/{{ disaster }}`)
+        .then(res => res.json())
+        .then(data => {
+            const heatData = data.map(p => [p.lat, p.lon, p.chance / 100]);
+            L.heatLayer(heatData, {
+                radius: 25,
+                blur: 20,
+                maxZoom: 6,
+                gradient: {
+                    0.4: 'blue',
+                    0.6: 'lime',
+                    0.8: 'orange',
+                    1.0: 'red'
+                }
+            }).addTo(map);
+        })
+        .catch(err => {
+            console.error("❌ Error loading map data:", err);
+            alert("Could not load map data. Check console for details.");
+        });
+</script>
+
+</body>
+</html>

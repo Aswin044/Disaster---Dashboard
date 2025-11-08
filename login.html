@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Disaster Prediction Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>🌍 Welcome Back</h2>
+        <p>Login to explore global disaster predictions</p>
+
+        <form method="POST" action="/login">
+            <input type="text" name="username" placeholder="👤 Username" required><br>
+            <input type="password" name="password" placeholder="🔒 Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+
+        <p>New here? <a href="/signup">Create an account</a></p>
+    </div>
+</body>
+</html>
